@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎰 Meazi Digital Lottery - 100 Numbers</title>
+    <title>🎰 Meazi Digital Lottery</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -34,6 +34,30 @@
             -webkit-text-fill-color: transparent;
         }
         .header p { color: #aaa; font-size: 14px; }
+        
+        .payment-info {
+            background: rgba(255,215,0,0.1);
+            border: 1px solid #ffd200;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .payment-info h3 { color: #ffd200; margin-bottom: 8px; }
+        .payment-info .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            max-width: 400px;
+            margin: 10px auto;
+        }
+        .payment-info .detail-item {
+            background: rgba(255,255,255,0.05);
+            padding: 8px;
+            border-radius: 8px;
+        }
+        .payment-info .detail-item .label { font-size: 10px; color: #888; }
+        .payment-info .detail-item .value { font-size: 16px; color: #ffd200; font-weight: bold; }
         
         .settings {
             background: rgba(255,255,255,0.08);
@@ -113,6 +137,30 @@
             font-weight: bold;
             cursor: pointer;
         }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+        }
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+        }
+        .legend-color.available { background: #4CAF50; }
+        .legend-color.taken { background: #f44336; }
+        .legend-color.yours { background: #ffd200; }
+        .legend-color.commissioner { background: #9C27B0; }
+        .legend-color.winner { background: #ffab00; }
         
         .number-grid {
             display: grid;
@@ -197,30 +245,6 @@
             50% { box-shadow: 0 0 60px rgba(255, 171, 0, 1); transform: scale(1.15); }
         }
         
-        .legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
-            margin: 10px 0;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 11px;
-        }
-        .legend-color {
-            width: 14px;
-            height: 14px;
-            border-radius: 4px;
-        }
-        .legend-color.available { background: #4CAF50; }
-        .legend-color.taken { background: #f44336; }
-        .legend-color.yours { background: #ffd200; }
-        .legend-color.commissioner { background: #9C27B0; }
-        .legend-color.winner { background: #ffab00; }
-        
         .actions {
             display: flex;
             flex-wrap: wrap;
@@ -247,31 +271,6 @@
         .btn-purple:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(156, 39, 176, 0.3); }
         .btn-info { background: #2196F3; color: white; }
         .btn-info:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(33, 150, 243, 0.3); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-        
-        .payment-info {
-            background: rgba(255,215,0,0.1);
-            border: 1px solid #ffd200;
-            border-radius: 12px;
-            padding: 15px;
-            margin: 10px 0;
-            text-align: center;
-        }
-        .payment-info h3 { color: #ffd200; margin-bottom: 8px; }
-        .payment-info .details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            max-width: 400px;
-            margin: 10px auto;
-        }
-        .payment-info .detail-item {
-            background: rgba(255,255,255,0.05);
-            padding: 8px;
-            border-radius: 8px;
-        }
-        .payment-info .detail-item .label { font-size: 10px; color: #888; }
-        .payment-info .detail-item .value { font-size: 16px; color: #ffd200; font-weight: bold; }
         
         .toast {
             position: fixed;
@@ -361,7 +360,6 @@
             <p>💰 100 Numbers | Fair Draw | Transparent</p>
         </div>
         
-        <!-- Payment Information -->
         <div class="payment-info">
             <h3>💳 Payment Details</h3>
             <div class="details">
@@ -445,7 +443,6 @@
         </div>
     </div>
     
-    <!-- Payment Modal -->
     <div class="modal" id="paymentModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('paymentModal')">✕</button>
@@ -466,7 +463,6 @@
         </div>
     </div>
     
-    <!-- Draw Modal -->
     <div class="modal" id="drawModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('drawModal')">✕</button>
@@ -482,7 +478,6 @@
         </div>
     </div>
     
-    <!-- Participants Modal -->
     <div class="modal" id="participantsModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('participantsModal')">✕</button>
@@ -491,13 +486,9 @@
         </div>
     </div>
     
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
     
     <script>
-        // ============================================================
-        //  CONFIGURATION
-        // ============================================================
         const PAYMENT_NUMBER = "0945223257";
         const BANK_NAME = "Commercial Bank of Ethiopia";
         const ACCOUNT_NAME = "Meazi Digital";
@@ -517,51 +508,32 @@
         let currentUser = null;
         let userBalance = 0;
         let myNumbers = [];
-        let isAdmin = false;
         
-        // ============================================================
-        //  USER MANAGEMENT
-        // ============================================================
         function setUserId() {
             const input = document.getElementById('userIdInput');
             const id = parseInt(input.value.trim());
-            
             if (!id || isNaN(id)) {
                 showToast('❌ Please enter a valid Telegram ID', 'error');
                 return;
             }
-            
-            currentUser = {
-                id: id,
-                name: 'Player' + id.toString().slice(-4)
-            };
-            
+            currentUser = { id: id, name: 'Player' + id.toString().slice(-4) };
             document.getElementById('userDisplay').textContent = currentUser.name + ' (#' + currentUser.id + ')';
             document.getElementById('userDisplay').style.color = '#4CAF50';
-            
-            // Load user data
             loadUserData();
             showToast('✅ User ID set successfully!', 'success');
         }
         
         function loadUserData() {
             if (!currentUser) return;
-            
             const balance = localStorage.getItem('balance_' + currentUser.id);
             userBalance = balance ? parseInt(balance) : 0;
-            
             const nums = localStorage.getItem('mynumbers_' + currentUser.id);
             myNumbers = nums ? JSON.parse(nums) : [];
-            
             document.getElementById('balanceDisplay').textContent = userBalance;
             updateUI();
         }
         
-        // ============================================================
-        //  GAME INITIALIZATION
-        // ============================================================
         function initGame() {
-            // Load saved state
             const saved = localStorage.getItem('gameState');
             if (saved) {
                 try {
@@ -569,39 +541,25 @@
                     gameState = parsed;
                 } catch(e) {}
             }
-            
-            // Initialize numbers if empty
             if (Object.keys(gameState.numbers).length === 0) {
                 for (let i = 1; i <= gameState.totalNumbers; i++) {
                     gameState.numbers[i] = { owner: null, ownerName: null, taken: false };
                 }
             }
-            
-            // Fix if number count changed
             const currentMax = Object.keys(gameState.numbers).length;
             if (currentMax < gameState.totalNumbers) {
                 for (let i = currentMax + 1; i <= gameState.totalNumbers; i++) {
                     gameState.numbers[i] = { owner: null, ownerName: null, taken: false };
                 }
             }
-            
-            // Update price display
             document.getElementById('displayPrice').textContent = gameState.price + ' Birr';
             document.getElementById('ticketPrice').value = gameState.price;
             document.getElementById('totalNumbers').value = gameState.totalNumbers;
-            
-            // Load user data if set
-            if (currentUser) {
-                loadUserData();
-            }
-            
+            if (currentUser) loadUserData();
             updateUI();
             saveGameState();
         }
         
-        // ============================================================
-        //  SAVE / LOAD
-        // ============================================================
         function saveGameState() {
             localStorage.setItem('gameState', JSON.stringify(gameState));
             if (currentUser) {
@@ -610,15 +568,11 @@
             }
         }
         
-        // ============================================================
-        //  UI UPDATES
-        // ============================================================
         function updateUI() {
             const taken = Object.values(gameState.numbers).filter(n => n.taken).length;
             const players = new Set(Object.values(gameState.numbers).filter(n => n.taken).map(n => n.owner)).size;
             const pool = taken * gameState.price;
             const available = gameState.totalNumbers - taken;
-            
             document.getElementById('roundId').textContent = gameState.round;
             document.getElementById('totalPlayers').textContent = players;
             document.getElementById('prizePool').textContent = pool + ' Birr';
@@ -626,7 +580,6 @@
             document.getElementById('soldCount').textContent = taken;
             document.getElementById('balanceDisplay').textContent = userBalance || 0;
             document.getElementById('displayPrice').textContent = gameState.price + ' Birr';
-            
             renderGrid();
             saveGameState();
         }
@@ -636,18 +589,14 @@
             const loading = document.getElementById('loading');
             grid.innerHTML = '';
             loading.style.display = 'none';
-            
             const mySet = new Set(myNumbers);
-            
             for (let i = 1; i <= gameState.totalNumbers; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'number-cell';
-                
                 const data = gameState.numbers[i];
                 const numSpan = document.createElement('span');
                 numSpan.textContent = i;
                 cell.appendChild(numSpan);
-                
                 if (gameState.winnerNumber === i) {
                     cell.classList.add('winner');
                     const label = document.createElement('span');
@@ -682,48 +631,33 @@
                     label.textContent = 'Buy';
                     cell.appendChild(label);
                 }
-                
                 grid.appendChild(cell);
             }
         }
         
-        // ============================================================
-        //  BUY TICKET
-        // ============================================================
         function buyNumber(number) {
             if (!currentUser) {
                 showToast('❌ Please set your Telegram ID first!', 'error');
                 return;
             }
-            
             if (gameState.numbers[number].taken) {
                 showToast('❌ Number already taken!', 'error');
                 return;
             }
-            
             if (userBalance < gameState.price) {
-                showToast(`❌ Insufficient balance! Need ${gameState.price} Birr. Use /pay`, 'error');
+                showToast(`❌ Insufficient balance! Need ${gameState.price} Birr`, 'error');
                 return;
             }
-            
             if (!confirm(`Buy number ${number} for ${gameState.price} Birr?`)) return;
-            
-            // Purchase
             gameState.numbers[number].taken = true;
             gameState.numbers[number].owner = currentUser.id;
             gameState.numbers[number].ownerName = currentUser.name;
             userBalance -= gameState.price;
             myNumbers.push(number);
-            
-            // Update player list
             if (!gameState.players[currentUser.id]) {
-                gameState.players[currentUser.id] = {
-                    name: currentUser.name,
-                    numbers: []
-                };
+                gameState.players[currentUser.id] = { name: currentUser.name, numbers: [] };
             }
             gameState.players[currentUser.id].numbers.push(number);
-            
             showToast(`✅ Purchased ticket #${number}! Good luck! 🍀`, 'success');
             updateUI();
         }
@@ -733,7 +667,6 @@
                 showToast('❌ Please set your Telegram ID first!', 'error');
                 return;
             }
-            
             const available = Object.keys(gameState.numbers).filter(n => !gameState.numbers[n].taken);
             if (available.length === 0) {
                 showToast('❌ No numbers available!', 'error');
@@ -743,41 +676,30 @@
             buyNumber(randomNum);
         }
         
-        // ============================================================
-        //  PAYMENT
-        // ============================================================
         function showPaymentModal() {
             if (!currentUser) {
                 showToast('❌ Please set your Telegram ID first!', 'error');
                 return;
             }
-            
             document.getElementById('payAmount').textContent = gameState.price;
             document.getElementById('payRef').textContent = 'REF-' + currentUser.id + '-' + Date.now().toString().slice(-6);
             document.getElementById('paymentModal').classList.add('show');
         }
         
-        // For admin testing - simulates payment confirmation
         function simulatePayment() {
             if (!currentUser) {
                 showToast('❌ Set user ID first', 'error');
                 return;
             }
-            
-            const amount = gameState.price;
-            userBalance += amount;
-            showToast(`💰 ${amount} Birr added to balance (Admin confirmed payment)`, 'success');
+            userBalance += gameState.price;
+            showToast(`💰 ${gameState.price} Birr added to balance`, 'success');
             updateUI();
             closeModal('paymentModal');
         }
         
-        // ============================================================
-        //  DRAW WINNER
-        // ============================================================
         function showDrawModal() {
             const taken = Object.values(gameState.numbers).filter(n => n.taken);
             const players = new Set(taken.map(n => n.owner)).size;
-            
             document.getElementById('drawPlayers').textContent = players;
             document.getElementById('drawPool').textContent = taken.length * gameState.price;
             document.getElementById('drawSold').textContent = taken.length;
@@ -789,23 +711,16 @@
         
         function drawWinner() {
             const taken = Object.values(gameState.numbers).filter(n => n.taken);
-            
             if (taken.length < 2) {
                 showToast('❌ Need at least 2 players to draw!', 'error');
                 return;
             }
-            
-            // Pick winner
             const winnerEntry = taken[Math.floor(Math.random() * taken.length)];
             const winnerNumber = Object.keys(gameState.numbers).find(n => gameState.numbers[n] === winnerEntry);
-            
             gameState.winner = winnerEntry.owner;
             gameState.winnerNumber = parseInt(winnerNumber);
-            
             const prize = taken.length * gameState.price;
             const winnerName = winnerEntry.ownerName || 'Player';
-            
-            // Show winner with celebration
             document.getElementById('drawResult').innerHTML = `
                 🎉🎊🎉<br>
                 <span style="font-size:48px;">🏆</span><br>
@@ -813,13 +728,8 @@
                 <span style="font-size:16px;color:#4CAF50;">${winnerName}</span><br>
                 Prize: <span style="color:#ffd200;">${prize} Birr</span>
             `;
-            
             document.getElementById('drawButton').disabled = true;
-            
-            // Show toast announcement
             showToast(`🎉 WINNER! #${winnerNumber} won ${prize} Birr! 🎉`, 'winner');
-            
-            // Save draw history
             gameState.drawHistory.push({
                 round: gameState.round,
                 winnerNumber: winnerNumber,
@@ -828,29 +738,19 @@
                 prize: prize,
                 timestamp: new Date().toISOString()
             });
-            
             updateUI();
             saveGameState();
-            
-            // Auto close after 10 seconds
             setTimeout(() => {
                 closeModal('drawModal');
-                // Auto-start new round after draw
-                if (confirm('Start new round?')) {
-                    resetGame();
-                }
+                if (confirm('Start new round?')) resetGame();
             }, 10000);
         }
         
-        // ============================================================
-        //  COMMISSIONER
-        // ============================================================
         function setCommissioner() {
             if (!currentUser) {
                 showToast('❌ Set your ID first', 'error');
                 return;
             }
-            
             if (gameState.commissioner) {
                 if (!confirm(`Commissioner already set. Reset?`)) return;
                 gameState.commissioner = null;
@@ -858,13 +758,9 @@
                 updateUI();
                 return;
             }
-            
             gameState.commissioner = currentUser.id;
-            
-            // Give commissioner 3 free numbers
             const available = Object.keys(gameState.numbers).filter(n => !gameState.numbers[n].taken);
             const freeCount = Math.min(3, available.length);
-            
             for (let i = 0; i < freeCount; i++) {
                 const num = parseInt(available[i]);
                 gameState.numbers[num].taken = true;
@@ -872,41 +768,29 @@
                 gameState.numbers[num].ownerName = currentUser.name + ' (Commissioner)';
                 myNumbers.push(num);
             }
-            
             showToast(`👑 Commissioner set! Got ${freeCount} free numbers.`, 'info');
             updateUI();
         }
         
-        // ============================================================
-        //  PARTICIPANTS LIST
-        // ============================================================
         function showParticipants() {
             const modal = document.getElementById('participantsModal');
             const list = document.getElementById('participantsList');
-            
             const taken = Object.values(gameState.numbers).filter(n => n.taken);
             const playerMap = {};
-            
             taken.forEach(n => {
                 if (!playerMap[n.owner]) {
-                    playerMap[n.owner] = {
-                        name: n.ownerName || 'Player',
-                        numbers: []
-                    };
+                    playerMap[n.owner] = { name: n.ownerName || 'Player', numbers: [] };
                 }
                 const num = Object.keys(gameState.numbers).find(k => gameState.numbers[k] === n);
                 playerMap[n.owner].numbers.push(parseInt(num));
             });
-            
             let html = '';
             const sorted = Object.keys(playerMap).sort((a,b) => playerMap[a].numbers.length - playerMap[b].numbers.length);
-            
-            sorted.forEach((id, index) => {
+            sorted.forEach((id) => {
                 const p = playerMap[id];
                 const isWinner = parseInt(id) === gameState.winner;
                 const isCommissioner = parseInt(id) === gameState.commissioner;
                 const isYou = parseInt(id) === currentUser?.id;
-                
                 html += `
                     <div style="background:${isWinner ? 'rgba(255,171,0,0.2)' : 'rgba(255,255,255,0.05)'};padding:10px;border-radius:8px;margin:5px 0;border-left:3px solid ${isWinner ? '#ffab00' : isCommissioner ? '#9C27B0' : isYou ? '#ffd200' : 'transparent'};">
                         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:5px;">
@@ -926,18 +810,12 @@
                     </div>
                 `;
             });
-            
             list.innerHTML = html || '<p style="color:#888;text-align:center;">No participants yet</p>';
             modal.classList.add('show');
         }
         
-        // ============================================================
-        //  RESET GAME
-        // ============================================================
         function resetGame() {
             if (!confirm('Start new round? All current data will be saved to history.')) return;
-            
-            // Save history
             const history = JSON.parse(localStorage.getItem('gameHistory') || '[]');
             history.push({
                 round: gameState.round,
@@ -948,61 +826,45 @@
                 timestamp: new Date().toISOString()
             });
             localStorage.setItem('gameHistory', JSON.stringify(history));
-            
-            // Reset
             gameState.round++;
             gameState.numbers = {};
             gameState.players = {};
             gameState.commissioner = null;
             gameState.winner = null;
             gameState.winnerNumber = null;
-            
             const total = parseInt(document.getElementById('totalNumbers').value);
             gameState.totalNumbers = total;
             gameState.price = parseInt(document.getElementById('ticketPrice').value);
-            
             for (let i = 1; i <= total; i++) {
                 gameState.numbers[i] = { owner: null, ownerName: null, taken: false };
             }
-            
-            // Reset user numbers
             myNumbers = [];
             if (currentUser) {
                 localStorage.setItem('mynumbers_' + currentUser.id, JSON.stringify(myNumbers));
             }
-            
             showToast(`🔄 New round ${gameState.round} started! Good luck!`, 'info');
             updateUI();
             saveGameState();
         }
         
-        // ============================================================
-        //  UTILITY FUNCTIONS
-        // ============================================================
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = `toast ${type} show`;
             clearTimeout(toast.timeout);
-            toast.timeout = setTimeout(() => {
-                toast.className = 'toast';
-            }, 5000);
+            toast.timeout = setTimeout(() => { toast.className = 'toast'; }, 5000);
         }
         
         function closeModal(id) {
             document.getElementById(id).classList.remove('show');
         }
         
-        // Close modals on background click
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) modal.classList.remove('show');
             });
         });
         
-        // ============================================================
-        //  ADMIN COMMANDS (Double-click for quick add)
-        // ============================================================
         document.querySelector('.user-info .balance').addEventListener('dblclick', function() {
             if (!currentUser) {
                 showToast('❌ Set user ID first', 'error');
@@ -1017,17 +879,11 @@
             }
         });
         
-        // ============================================================
-        //  AUTO-LOAD USER FROM TELEGRAM WEB APP
-        // ============================================================
         if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
             const user = tg.initDataUnsafe.user;
             if (user) {
-                currentUser = {
-                    id: user.id,
-                    name: user.first_name || user.username || 'Player'
-                };
+                currentUser = { id: user.id, name: user.first_name || user.username || 'Player' };
                 document.getElementById('userIdInput').value = user.id;
                 document.getElementById('userDisplay').textContent = currentUser.name + ' (#' + currentUser.id + ')';
                 document.getElementById('userDisplay').style.color = '#4CAF50';
@@ -1036,17 +892,8 @@
             }
         }
         
-        // ============================================================
-        //  START THE GAME
-        // ============================================================
         initGame();
         console.log('🎰 Meazi Digital Lottery loaded!');
-        console.log('💳 Payment: Telebirr 0945223257 | CBE');
-        console.log('📊 Game State:', gameState);
-        console.log('💡 Tips:');
-        console.log('  - Double-click balance to add funds (admin)');
-        console.log('  - Commissioner gets 3 free numbers');
-        console.log('  - Draw requires at least 2 players');
     </script>
 </body>
 </html>
